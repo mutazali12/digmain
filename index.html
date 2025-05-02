@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Digital Horizons - حلول برمجية متكاملة</title>
+  <meta name="description" content="نقدم حلول برمجية متكاملة لتطوير مواقع وتطبيقات الويب والهاتف بأحدث التقنيات" />
+  <link rel="icon" href="favicon.ico" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      overflow-x: hidden;
+      background: linear-gradient(135deg, #1e3a8a, #4c1d95);
+      font-family: 'Cairo', sans-serif;
+      direction: rtl;
+      color: #f1f5f9;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding-top: 6rem;
+    }
+
+    #canvas3d {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      opacity: 0.3;
+    }
+
+    .header {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+      display: flex;
+      justify-content: center; /* جعل العنوان في المنتصف */
+      align-items: center;
+      padding: 1rem 2rem;
+    }
+
+    .logo {
+      text-align: center;
+    }
+
+    .logo h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(to right, #3b82f6, #9333ea);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav {
+      display: none;
+    }
+
+    .main {
+      flex: 1;
+      padding: 2rem;
+      text-align: center;
+      margin-top: 4rem;
+      margin-right: 0;
+      transition: margin-right 0.3s ease;
+    }
+
+    .main.sidebar-open {
+      margin-right: 250px;
+    }
+
+    .hero {
+      min-height: auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(to right, #3b82f6, #9333ea);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero p {
+      font-size: 1.5rem;
+      max-width: 800px;
+      margin-bottom: 2rem;
+      color: #f1f5f9;
+    }
+
+    .cta-button {
+      display: inline-flex;
+      align-items: center;
+      background: #22c55e;
+      color: #1e3a8a;
+      padding: 0.75rem 1.5rem;
+      border-radius: 9999px;
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .cta-button i {
+      margin-right: 0.5rem; /* مسافة بين النص والأيقونة */
+      font-size: 1.2rem; /* تحسين حجم الأيقونة */
+    }
+
+    .cta-button:hover {
+      background: #16a34a;
+      transform: scale(1.05);
+    }
+
+    .section {
+      padding: 4rem 2rem;
+    }
+
+    .section-title {
+      font-size: 2.5rem;
+      margin-bottom: 2rem;
+      background: linear-gradient(to right, #3b82f6, #9333ea);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      position: relative;
+      display: inline-block;
+    }
+
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 4px;
+      background: linear-gradient(to right, #3b82f6, #9333ea);
+      border-radius: 2px;
+    }
+
+    .services {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .service-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 1rem;
+      padding: 2rem;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease;
+      text-align: right;
+    }
+
+    .service-card:hover {
+      transform: translateY(-10px);
+    }
+
+    .service-card h3 {
+      font-size: 1.5rem;
+      color: #22c55e;
+      margin-bottom: 1rem;
+    }
+
+    .service-card ul {
+      list-style: none;
+      padding: 0;
+      margin-bottom: 1rem;
+    }
+
+    .service-card li {
+      font-size: 1rem;
+      color: #f1f5f9;
+      margin: 0.5rem 0;
+      position: relative;
+      padding-right: 25px;
+    }
+
+    .service-card li::before {
+      content: '\f00c';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      position: absolute;
+      right: 0;
+      color: #22c55e;
+    }
+
+    .service-card .price {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px dashed rgba(255, 255, 255, 0.3);
+    }
+
+    .contact {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 4rem 2rem;
+      border-radius: 1rem;
+      margin: 2rem auto;
+      max-width: 1200px;
+      position: relative;
+    }
+
+    .contact h2 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(to right, #3b82f6, #9333ea);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .contact p {
+      font-size: 1.2rem;
+      max-width: 700px;
+      margin: 0 auto 2rem;
+      color: #f1f5f9;
+    }
+
+    .whatsapp-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #22c55e;
+      color: #1e3a8a;
+      padding: 0.75rem 1.5rem;
+      border-radius: 9999px;
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .whatsapp-button:hover {
+      background: #16a34a;
+      transform: scale(1.05);
+    }
+
+    .whatsapp-button i {
+      font-size: 1.5rem;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      right: -250px;
+      width: 250px;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+      padding: 2rem 1rem;
+      transition: right 0.3s ease;
+      z-index: 999;
+      overflow-y: auto;
+    }
+
+    .sidebar.open {
+      right: 0;
+    }
+
+    .sidebar-toggle-btn {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      background: rgba(255, 255, 255, 0.1);
+      color: #f1f5f9;
+      border: none;
+      padding: 0.5rem;
+      border-radius: 0.25rem;
+      cursor: pointer;
+      z-index: 1001;
+    }
+
+    .sidebar-toggle-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .sidebar h2 {
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+      color: #22c55e;
+      text-align: right;
+    }
+
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin-bottom: 1rem;
+    }
+
+    .sidebar ul li {
+      margin-bottom: 0.5rem;
+    }
+
+    .sidebar ul li a {
+      color: #f1f5f9;
+      text-decoration: none;
+      font-size: 0.9rem;
+      display: block;
+      padding: 0.5rem;
+      border-radius: 0.25rem;
+      transition: background-color 0.3s ease;
+    }
+
+    .sidebar ul li a:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .footer {
+      background: rgba(0, 0, 0, 0.5);
+      color: #f1f5f9;
+      text-align: center;
+      padding: 2rem 1rem;
+      position: relative;
+    }
+
+    .footer::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: linear-gradient(to right, #3b82f6, #9333ea);
+    }
+
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .social-links a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      color: #f1f5f9;
+      font-size: 1.2rem;
+      transition: all 0.3s;
+    }
+
+    .social-links a:hover {
+      background: #22c55e;
+      transform: translateY(-5px);
+    }
+
+    .footer p {
+      margin-bottom: 1rem;
+    }
+
+    .copyright {
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+
+    .back-to-top {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(to right, #3b82f6, #9333ea);
+      color: #f1f5f9;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      cursor: pointer;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      z-index: 999;
+    }
+
+    .back-to-top.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .back-to-top:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    @media (max-width: 992px) {
+      .header {
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .main {
+        margin-right: 0 !important;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 200px;
+        right: -200px;
+      }
+
+      .main.sidebar-open {
+        margin-right: 200px;
+      }
+
+      .sidebar-toggle-btn {
+        top: 0.5rem;
+        right: 0.5rem;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .sidebar {
+        width: 180px;
+        right: -180px;
+      }
+
+      .main.sidebar-open {
+        margin-right: 180px;
+      }
+
+      .sidebar-toggle-btn {
+        top: 0.5rem;
+        right: 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas3d"></canvas>
+
+  <header class="header">
+    <div class="logo">
+      <h1>Digital Horizons</h1>
+    </div>
+    <button class="sidebar-toggle-btn" id="sidebarToggleBtn">
+      <i class="fas fa-bars"></i>
+    </button>
+    <nav class="nav">
+      <ul>
+        <li><a href="#">الصفحة الرئيسية</a></li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle">خدماتنا <i class="fas fa-chevron-down"></i></a>
+          <ul class="dropdown-menu">
+            <li><a href="#"><i class="fas fa-code"></i> برمجة مواقع وتطبيقات الويب</a></li>
+            <li><a href="#"><i class="fas fa-mobile-alt"></i> تطبيقات الهاتف</a></li>
+            <li><a href="#"><i class="fas fa-cogs"></i> تطوير وصيانة الأنظمة</a></li>
+            <li><a href="#"><i class="fas fa-server"></i> استضافة ودومينات</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle">أنظمتنا <i class="fas fa-chevron-down"></i></a>
+          <ul class="dropdown-menu">
+            <li><a href="#"><i class="fas fa-globe"></i> مواقع وتطبيقات الويب</a></li>
+            <li><a href="#"><i class="fas fa-mobile"></i> تطبيقات الهاتف</a></li>
+            <li><a href="#"><i class="fab fa-windows"></i> تطبيقات ويندوز</a></li>
+            <li><a href="#"><i class="fas fa-network-wired"></i> تركيب وبرمجة السيرفرات</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle">منتجاتنا <i class="fas fa-chevron-down"></i></a>
+          <ul class="dropdown-menu">
+            <li><a href="#"><i class="fas fa-file-code"></i> مواقع ويب ثابتة</a></li>
+            <li><a href="#"><i class="fas fa-shopping-cart"></i> متاجر إلكترونية</a></li>
+            <li><a href="#"><i class="fas fa-money-bill-wave"></i> تطبيقات دفع</a></li>
+            <li><a href="#"><i class="fas fa-taxi"></i> تطبيقات ليموزين وتاكسي</a></li>
+            <li><a href="#"><i class="fas fa-graduation-cap"></i> تطبيقات تعليمية</a></li>
+            <li><a href="#"><i class="fas fa-utensils"></i> تطبيقات مطاعم</a></li>
+            <li><a href="#"><i class="fas fa-store"></i> تطبيقات إدارة محلات</a></li>
+          </ul>
+        </li>
+        <li><a href="#">الأسعار والتكاليف</a></li>
+        <li><a href="#">من نحن</a></li>
+        <li><a href="#">تواصل معنا</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="main">
+    <section class="hero">
+      <h1>حلول برمجية مبتكرة لتحقيق رؤيتك</h1>
+      <p>نقدم حلولاً تقنية متكاملة لتطوير مواقع الويب وتطبيقات الهاتف بأحدث التقنيات والأساليب المبتكرة</p>
+      <a href="#services" class="cta-button"><i class="fas fa-arrow-down"></i> اكتشف خدماتنا</a>
+    </section>
+
+    <section id="services" class="section">
+      <h2 class="section-title">خدماتنا المميزة</h2>
+      <div class="services">
+        <div class="service-card">
+          <h3>برمجة موقع متكامل</h3>
+          <ul>
+            <li>إطار عمل Laravel أو Next.js (واجهة أمامية وخلفية): 4000 جنيه</li>
+            <li>استضافة 10 جيجا سنويًا: 4000 جنيه</li>
+            <li>دومين .com سنويًا: 2000 جنيه</li>
+            <li>شهادات أمان مجانية</li>
+            <li>تكاليف إضافية للـ APIs حسب الحاجة</li>
+          </ul>
+          <p class="price">الإجمالي: 10,000 جنيه</p>
+        </div>
+
+        <div class="service-card">
+          <h3>تركيب موقع جاهز</h3>
+          <ul>
+            <li>تركيب موقع مبرمج على استضافة محجوزة مسبقًا: 1500 جنيه</li>
+            <li>صيانة أو تطوير موقع: 500 جنيه</li>
+            <li>دعم فني لمدة شهر</li>
+            <li>تدريب على استخدام النظام</li>
+          </ul>
+        </div>
+
+        <div class="service-card">
+          <h3>موقع ويب ثابت (Next.js)</h3>
+          <ul>
+            <li>واجهة أمامية فقط باستخدام Next.js</li>
+            <li>دومين .com</li>
+            <li>بدون قواعد بيانات أو حسابات</li>
+            <li>مثالي للمدونات ومعارض الأعمال</li>
+            <li>تصميم متجاوب لجميع الأجهزة</li>
+          </ul>
+          <p class="price">السعر: 2000 جنيه سنويًا</p>
+        </div>
+
+        <div class="service-card">
+          <h3>برمجة تطبيقات أندرويد وآيفون</h3>
+          <ul>
+            <li>برمجة التطبيق: 2000 جنيه</li>
+            <li>استضافة 10 جيجا مع دومين: 5000 جنيه سنويًا</li>
+            <li>تكاليف إضافية للـ APIs حسب الحاجة</li>
+            <li>رفع التطبيق على متجر أبل/جوجل (حساب خاص): 500 دولار</li>
+            <li>رفع التطبيق (حساب عام): 150 دولار</li>
+          </ul>
+        </div>
+
+        <div class="service-card">
+          <h3>موقع ويب رسمي للتطبيق</h3>
+          <ul>
+            <li>موقع ويب ثابت باستخدام Next.js</li>
+            <li>دومين .com لتحميل التطبيقات</li>
+            <li>صفحة توضيحية عن التطبيق</li>
+            <li>روابط تحميل مباشرة</li>
+            <li>نموذج تواصل</li>
+          </ul>
+          <p class="price">السعر: 2000 جنيه</p>
+        </div>
+
+        <div class="service-card">
+          <h3>تحويل موقع إلى تطبيق</h3>
+          <ul>
+            <li>تحويل موقع إلكتروني إلى تطبيق هاتف</li>
+            <li>صفحة ويب ثابتة لتحميل التطبيق</li>
+            <li>وظائف الهاتف الأساسية</li>
+            <li>إشعارات push</li>
+            <li>رفع التطبيق على متجر أبل/جوجل: 150 دولار (حساب عام) أو 500 دولار (حساب خاص)</li>
+          </ul>
+          <p class="price">السعر: 3000 جنيه</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="contact">
+      <h2 class="section-title">تواصلوا معنا</h2>
+      <p>لديك فكرة أو مشروع تريد تنفيذه؟ نحن هنا لمساعدتك في تحويل رؤيتك إلى واقع رقمي</p>
+      <a href="https://wa.me/201287027277" target="_blank" rel="noopener noreferrer" class="whatsapp-button">
+        تواصل عبر واتساب <i class="fab fa-whatsapp"></i>
+      </a>
+    </section>
+  </main>
+
+  <aside class="sidebar">
+    <h2>القائمة الرئيسية</h2>
+    <ul></ul>
+  </aside>
+
+  <footer class="footer">
+    <div class="social-links">
+      <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+      <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+      <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+      <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+      <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+    </div>
+    <p>Digital Horizons - أفقك الرقمي نحو المستقبل</p>
+    <p class="copyright">© 2025 Digital Horizons. جميع الحقوق محفوظة.</p>
+  </footer>
+
+  <div class="back-to-top" id="backToTop">
+    <i class="fas fa-arrow-up"></i>
+  </div>
+
+  <script>
+    const sidebar = document.querySelector('.sidebar');
+    const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+    const mainContent = document.querySelector('.main');
+    const originalNav = document.querySelector('.header .nav ul');
+    const sidebarMenu = document.querySelector('.sidebar ul');
+
+    // نقل محتوى القائمة الرئيسية إلى الشريط الجانبي
+    if (originalNav && sidebarMenu) {
+      sidebarMenu.innerHTML = originalNav.innerHTML;
+    }
+
+    // التحكم في فتح وإغلاق القائمة الجانبية
+    sidebarToggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      sidebar.classList.toggle('open');
+      mainContent.classList.toggle('sidebar-open');
+      sidebarToggleBtn.innerHTML = sidebar.classList.contains('open')
+        ? '<i class="fas fa-times"></i>'
+        : '<i class="fas fa-bars"></i>';
+    });
+
+    // إغلاق القائمة الجانبية عند النقر خارجها
+    document.addEventListener('click', (event) => {
+      if (
+        !sidebar.contains(event.target) &&
+        !sidebarToggleBtn.contains(event.target) &&
+        sidebar.classList.contains('open')
+      ) {
+        sidebar.classList.remove('open');
+        mainContent.classList.remove('sidebar-open');
+        sidebarToggleBtn.innerHTML = '<i class="fas fa-bars"></i>';
+      }
+    });
+
+    // إغلاق القائمة الجانبية عند النقر على رابط داخلها
+    sidebarMenu.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => {
+        sidebar.classList.remove('open');
+        mainContent.classList.remove('sidebar-open');
+        sidebarToggleBtn.innerHTML = '<i class="fas fa-bars"></i>';
+      });
+    });
+
+    // 3D Background Animation
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas3d'), alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    const geometry = new THREE.TorusKnotGeometry(10, 3, 100, 16);
+    const material = new THREE.MeshBasicMaterial({ color: 0x3b82f6, wireframe: true });
+    const torusKnot = new THREE.Mesh(geometry, material);
+    scene.add(torusKnot);
+
+    camera.position.z = 30;
+
+    function animate3D() {
+      requestAnimationFrame(animate3D);
+      torusKnot.rotation.x += 0.01;
+      torusKnot.rotation.y += 0.01;
+      renderer.render(scene, camera);
+    }
+    animate3D();
+
+    // Window Resize Handler
+    window.addEventListener('resize', () => {
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+    });
+
+    // GSAP Animations
+    gsap.from(".hero h1, .hero p, .cta-button", {
+      opacity: 0,
+      y: 50,
+      stagger: 0.2,
+      duration: 1,
+      ease: "power3.out",
+    });
+
+    gsap.from(".service-card", {
+      opacity: 0,
+      y: 30,
+      stagger: 0.2,
+      duration: 0.8,
+      ease: "power2.out",
+      scrollTrigger: {
+        trigger: ".services",
+        start: "top 80%",
+      },
+    });
+
+    gsap.from(".contact", {
+      opacity: 0,
+      y: 50,
+      duration: 1,
+      ease: "power3.out",
+      scrollTrigger: {
+        trigger: ".contact",
+        start: "top 80%",
+      },
+    });
+
+    // Back to Top Button
+    const backToTopButton = document.getElementById('backToTop');
+    window.addEventListener('scroll', () => {
+      if (window.pageYOffset > 300) {
+        backToTopButton.classList.add('active');
+      } else {
+        backToTopButton.classList.remove('active');
+      }
+    });
+
+    backToTopButton.addEventListener('click', () => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+    });
+
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href');
+        if (targetId === '#') return;
+        const targetElement = document.querySelector(targetId);
+        if (targetElement) {
+          window.scrollTo({
+            top: targetElement.offsetTop - 100,
+            behavior: 'smooth',
+          });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
